@@ -1,0 +1,31 @@
+{
+  "name": "@tyroneross/showcase",
+  "version": "0.1.0",
+  "description": "Dev asset capture plugin for Claude Code — screenshots and video clips during development",
+  "type": "module",
+  "main": "dist/mcp/server.js",
+  "types": "dist/types.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": { "name": "Tyrone Ross" },
+  "license": "MIT",
+  "repository": "https://github.com/tyroneross/showcase",
+  "keywords": ["claude-code", "screenshots", "video", "dev-assets", "capture"],
+  "peerDependencies": {
+    "playwright": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.3.0"
+  }
+}

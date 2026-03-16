@@ -1,0 +1,14 @@
+{
+  "name": "showcase",
+  "version": "0.1.0",
+  "description": "Dev asset capture — screenshots and video clips during development for blog/website content",
+  "author": { "name": "Tyrone Ross" },
+  "homepage": "https://github.com/tyroneross/showcase",
+  "repository": "https://github.com/tyroneross/showcase",
+  "license": "MIT",
+  "keywords": ["screenshots", "video", "capture", "dev-assets", "blog"],
+  "commands": "../commands",
+  "hooks": "../hooks/hooks.json",
+  "skills": "../skills/",
+  "mcpServers": "../.mcp.json"
+}
