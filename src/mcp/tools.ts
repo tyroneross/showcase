@@ -6,6 +6,7 @@ import { resolveTarget } from "../capture/detect.js";
 import { webScreenshot } from "../capture/web.js";
 import { resolveWindowId, screenCapture } from "../capture/screen.js";
 import { findDevice, simulatorScreenshot } from "../capture/simulator.js";
+import { recordClip } from "../capture/recorder.js";
 import {
   loadIndex,
   addCapture,
@@ -483,10 +484,42 @@ async function handleCapture(
 async function handleRecord(
   args: Record<string, unknown>
 ): Promise<{ content: ContentBlock[]; isError?: boolean }> {
-  // Phase 5 — video recording
-  return errorResponse(
-    "Video recording will be implemented in Phase 5. Use 'capture' for screenshots."
-  );
+  const target = args.target as string;
+  if (!target) return errorResponse("target is required");
+
+  const config = loadConfig();
+  const duration = args.duration as number | undefined;
+  if (duration !== undefined && duration > config.video.maxDuration) {
+    return errorResponse(
+      `Duration ${duration}s exceeds max of ${config.video.maxDuration}s`
+    );
+  }
+
+  const result = await recordClip({
+    target,
+    duration,
+    viewport: args.viewport as ViewportPreset | undefined,
+    tags: args.tags as string[] | undefined,
+    title: args.title as string | undefined,
+    feature: args.feature as string | undefined,
+    component: args.component as string | undefined,
+  });
+
+  const meta = [
+    `Recorded: ${result.entry.id}`,
+    result.entry.title ? `Title: ${result.entry.title}` : null,
+    `Source: ${result.entry.source} (${result.entry.platform})`,
+    `Duration: ${((result.entry.duration_ms || 0) / 1000).toFixed(1)}s`,
+    `Size: ${formatBytes(result.entry.size_bytes)}`,
+    `File: ${result.filePath}`,
+    result.entry.tags.length
+      ? `Tags: ${result.entry.tags.join(", ")}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return textResponse(meta);
 }
 
 function handleFind(
