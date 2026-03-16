@@ -4,6 +4,8 @@ import { join } from "path";
 import { loadConfig } from "../config.js";
 import { resolveTarget } from "../capture/detect.js";
 import { webScreenshot } from "../capture/web.js";
+import { resolveWindowId, screenCapture } from "../capture/screen.js";
+import { findDevice, simulatorScreenshot } from "../capture/simulator.js";
 import {
   loadIndex,
   addCapture,
@@ -417,16 +419,26 @@ async function handleCapture(
       break;
     }
     case "screen": {
-      // Phase 4 — macOS screencapture
-      return errorResponse(
-        `macOS screen capture not yet implemented. Use a URL for web captures.`
-      );
+      const windowId = await resolveWindowId(resolved.appName!);
+      await screenCapture(windowId, outputPath);
+      break;
     }
     case "simulator": {
-      // Phase 4 — xcrun simctl
-      return errorResponse(
-        `Simulator capture not yet implemented. Use a URL for web captures.`
-      );
+      const device = await findDevice(resolved.deviceName!);
+      if (!device) {
+        return errorResponse(
+          `No simulator found for '${resolved.deviceName}'. Run: xcrun simctl list devices`
+        );
+      }
+      if (device.state !== "Booted") {
+        return errorResponse(
+          `Simulator '${device.name}' is not booted. Boot with: xcrun simctl boot "${device.udid}"`
+        );
+      }
+      resolved.deviceUdid = device.udid;
+      await simulatorScreenshot(device.udid, outputPath);
+      viewport = { width: 0, height: 0 }; // Determined by device
+      break;
     }
   }
 
@@ -441,6 +453,7 @@ async function handleCapture(
     url: resolved.url,
     viewport,
     selector: args.selector as string | undefined,
+    device_name: resolved.deviceName,
     title: args.title as string | undefined,
     feature: args.feature as string | undefined,
     component: args.component as string | undefined,
