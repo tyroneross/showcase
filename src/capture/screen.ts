@@ -1,4 +1,4 @@
-import { execFile, execFileSync } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import { mkdirSync } from "fs";
 import { dirname } from "path";
@@ -6,51 +6,43 @@ import { dirname } from "path";
 const execFileAsync = promisify(execFile);
 
 /**
- * Resolve an app name to its frontmost window ID via AppleScript.
- * Falls back to matching by process name if no window is found.
+ * Resolve an app name to its best visible window ID.
+ * Uses Swift + CGWindowListCopyWindowInfo for reliable cross-app resolution.
+ * Picks the largest on-screen, layer-0 window matching the app name.
  */
 export async function resolveWindowId(appName: string): Promise<number> {
-  // Use AppleScript to get the window ID of the named app
-  const script = `
-    tell application "System Events"
-      set targetProc to first process whose name contains "${appName.replace(/"/g, '\\"')}"
-      set targetPid to unix id of targetProc
-    end tell
-    do shell script "osascript -e 'tell application \\"System Events\\" to tell (first process whose unix id is " & targetPid & ") to get id of first window'"
-  `;
+  // Swift is always available on macOS and can access CoreGraphics directly
+  const swiftCode = `
+import Cocoa
+let app = CommandLine.arguments[1].lowercased()
+let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else { exit(1) }
 
-  try {
-    const { stdout } = await execFileAsync("osascript", ["-e", script], {
-      timeout: 10000,
-    });
-    const windowId = parseInt(stdout.trim(), 10);
-    if (!isNaN(windowId)) return windowId;
-  } catch {
-    // Fall through to CGWindowListCopyWindowInfo approach
-  }
-
-  // Fallback: use Python + Quartz to find window by owner name
-  const pyScript = `
-import Quartz, sys
-app = sys.argv[1].lower()
-for w in Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID):
-    owner = w.get(Quartz.kCGWindowOwnerName, "").lower()
-    if app in owner and w.get(Quartz.kCGWindowLayer, 999) == 0:
-        print(w[Quartz.kCGWindowNumber])
-        sys.exit(0)
-sys.exit(1)
+var best: (id: Int, area: Int) = (0, 0)
+for win in list {
+    let owner = (win[kCGWindowOwnerName as String] as? String ?? "").lowercased()
+    let layer = win[kCGWindowLayer as String] as? Int ?? -1
+    guard owner.contains(app), layer == 0 else { continue }
+    let wid = win[kCGWindowNumber as String] as? Int ?? 0
+    let bounds = win[kCGWindowBounds as String] as? [String: Any] ?? [:]
+    let w = bounds["Width"] as? Int ?? 0
+    let h = bounds["Height"] as? Int ?? 0
+    let area = w * h
+    if area > best.area { best = (wid, area) }
+}
+if best.id > 0 { print(best.id) } else { exit(1) }
 `;
 
   try {
     const { stdout } = await execFileAsync(
-      "python3",
-      ["-c", pyScript, appName],
-      { timeout: 10000 }
+      "swift",
+      ["-e", swiftCode, appName],
+      { timeout: 15000 }
     );
     const windowId = parseInt(stdout.trim(), 10);
-    if (!isNaN(windowId)) return windowId;
+    if (!isNaN(windowId) && windowId > 0) return windowId;
   } catch {
-    // Neither method worked
+    // Swift resolution failed
   }
 
   throw new Error(
@@ -74,17 +66,19 @@ export async function screenCapture(
 }
 
 /**
- * Start recording a macOS window. Returns a handle to stop recording.
- * screencapture -v records video; SIGINT stops it.
+ * Start recording the screen. Returns a handle to stop recording.
+ * Note: screencapture -v does not support per-window recording (-l flag
+ * exits immediately on modern macOS). Records full screen instead.
+ * windowId parameter is accepted for API consistency but not used for video.
  */
 export function startScreenRecording(
-  windowId: number,
+  _windowId: number,
   outputPath: string
 ): { stop: () => Promise<void>; process: ReturnType<typeof execFile> } {
   mkdirSync(dirname(outputPath), { recursive: true });
   const proc = execFile(
     "screencapture",
-    ["-v", "-l", String(windowId), "-x", outputPath],
+    ["-v", "-x", outputPath],
     { timeout: 60000 }
   );
 
