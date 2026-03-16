@@ -11,7 +11,6 @@ let browserInstance: any = null;
 async function getPlaywright(): Promise<any> {
   if (!playwrightMod) {
     try {
-      // @ts-expect-error — optional peer dependency, resolved at runtime
       playwrightMod = await import("playwright");
     } catch {
       throw new Error(
@@ -80,7 +79,7 @@ export async function webScreenshot(
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    await page.goto(url, { waitUntil: "load", timeout: 30000 });
 
     if (delay > 0) {
       await page.waitForTimeout(delay);
@@ -141,7 +140,7 @@ export async function webRecord(
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    await page.goto(url, { waitUntil: "load", timeout: 30000 });
 
     if (delay > 0) {
       await page.waitForTimeout(delay);
