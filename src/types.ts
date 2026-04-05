@@ -28,6 +28,12 @@ export interface CaptureEntry {
   tags: string[];
   starred: boolean;
 
+  // Walkthrough metadata
+  walkthrough?: {
+    step_count: number;
+    steps: string[]; // Step titles for search/display
+  };
+
   // Auto-populated context
   git_branch?: string;
   git_commit?: string;
@@ -156,4 +162,53 @@ export interface RecordResult {
   entry: CaptureEntry;
   filePath: string;
   thumbnailPath?: string;
+}
+
+// --- Walkthrough ---
+
+export type WalkthroughAction =
+  | "click"
+  | "type"
+  | "fill"
+  | "hover"
+  | "select"
+  | "navigate"
+  | "screenshot"
+  | "wait"
+  | "scroll";
+
+export interface WalkthroughStep {
+  action: WalkthroughAction;
+  selector?: string;
+  text?: string;
+  value?: string;
+  url?: string;
+  duration?: number; // ms (for wait)
+  y?: number; // pixel position (for scroll)
+  title?: string;
+}
+
+export interface StepResult {
+  index: number;
+  action: WalkthroughAction;
+  title: string;
+  timestamp_ms: number;
+  duration_ms: number;
+  screenshotPath?: string;
+  screenshotFile?: string; // filename only
+  error?: string;
+}
+
+export interface WalkthroughManifest {
+  steps: StepResult[];
+  total_duration_ms: number;
+  step_count: number;
+}
+
+export interface WalkthroughResult {
+  entry: CaptureEntry;
+  filePath: string;
+  thumbnailPath?: string;
+  manifest: WalkthroughManifest;
+  stepScreenshots: string[]; // file paths
 }

@@ -16,6 +16,7 @@ Capture screenshots and video clips during development for blog/website content.
 | `gallery` | List all captures grouped by feature/date/component |
 | `export` | Copy captures to output dir with markdown manifest |
 | `status` | Library stats |
+| `walkthrough` | Interactive scripted walkthrough with video + per-step screenshots |
 | `delete` | Remove capture + media |
 
 ## Commands
@@ -28,6 +29,7 @@ Capture screenshots and video clips during development for blog/website content.
 | `/showcase:tag` | Tag a capture |
 | `/showcase:gallery` | Overview of all captures |
 | `/showcase:export` | Export for blog/website |
+| `/showcase:walkthrough` | Record interactive walkthrough |
 | `/showcase:status` | Library stats |
 
 ## Capture Targets

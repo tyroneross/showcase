@@ -1,5 +1,14 @@
-import type { Viewport, ViewportPreset } from "../types.js";
+import { writeFileSync } from "fs";
+import { join } from "path";
+import type {
+  Viewport,
+  ViewportPreset,
+  WalkthroughStep,
+  StepResult,
+  WalkthroughManifest,
+} from "../types.js";
 import { VIEWPORT_PRESETS } from "../types.js";
+import { executeStep, waitForSettle } from "./interact.js";
 
 // Playwright is an optional peer dependency — all types are `any` to avoid
 // build failures when it's not installed. Validated at runtime.
@@ -157,6 +166,86 @@ export async function webRecord(
     await page.close();
     const videoPath = video ? await video.path() : "";
     return { videoPath, viewport: { ...vp } };
+  } finally {
+    await context.close();
+  }
+}
+
+// --- Walkthrough ---
+
+export interface WebWalkthroughOptions {
+  url: string;
+  captureDir: string; // Directory for all output files
+  steps: WalkthroughStep[];
+  viewport?: ViewportPreset;
+  stepDelay?: number; // ms between steps (default 500)
+}
+
+export interface WebWalkthroughResult {
+  videoPath: string;
+  viewport: Viewport;
+  stepResults: StepResult[];
+  manifestPath: string;
+}
+
+export async function webWalkthrough(
+  options: WebWalkthroughOptions
+): Promise<WebWalkthroughResult> {
+  const {
+    url,
+    captureDir,
+    steps,
+    viewport: vpPreset = "desktop",
+    stepDelay = 500,
+  } = options;
+
+  const vp = VIEWPORT_PRESETS[vpPreset];
+  const browser = await getBrowser();
+  const context = await browser.newContext({
+    viewport: { width: vp.width, height: vp.height },
+    reducedMotion: "no-preference", // Keep animations for video
+    recordVideo: {
+      dir: captureDir,
+      size: { width: vp.width, height: vp.height },
+    },
+  });
+
+  const page = await context.newPage();
+  const stepResults: StepResult[] = [];
+  const startTime = Date.now();
+
+  try {
+    // Navigate to target URL
+    await page.goto(url, { waitUntil: "load", timeout: 30000 });
+    await waitForSettle(page);
+
+    // Execute each step
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      const result = await executeStep(page, step, captureDir, i + 1, startTime);
+      stepResults.push(result);
+
+      // Pause between steps so video shows distinct states
+      if (i < steps.length - 1 && step.action !== "wait") {
+        await page.waitForTimeout(stepDelay);
+      }
+    }
+
+    // Close page to finalize video
+    const video = page.video();
+    await page.close();
+    const videoPath = video ? await video.path() : "";
+
+    // Write walkthrough manifest
+    const manifest: WalkthroughManifest = {
+      steps: stepResults,
+      total_duration_ms: Date.now() - startTime,
+      step_count: stepResults.length,
+    };
+    const manifestPath = join(captureDir, "walkthrough.json");
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+    return { videoPath, viewport: { ...vp }, stepResults, manifestPath };
   } finally {
     await context.close();
   }

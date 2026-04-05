@@ -3,7 +3,7 @@ import { readFileSync, statSync } from "fs";
 import { join } from "path";
 import { loadConfig } from "../config.js";
 import { resolveTarget } from "../capture/detect.js";
-import { webScreenshot } from "../capture/web.js";
+import { webScreenshot, webWalkthrough } from "../capture/web.js";
 import { resolveWindowId, screenCapture } from "../capture/screen.js";
 import { findDevice, simulatorScreenshot } from "../capture/simulator.js";
 import { recordClip } from "../capture/recorder.js";
@@ -24,11 +24,18 @@ import {
   getMediaDir,
 } from "../storage/media.js";
 import { filterCaptures, groupCaptures } from "../metadata/query.js";
+import {
+  transcodeToMp4,
+  extractThumbnail,
+  getVideoDuration,
+  isTranscodeNeeded,
+} from "../capture/transcode.js";
 import type {
   CaptureEntry,
   FindQuery,
   GalleryGroupBy,
   ViewportPreset,
+  WalkthroughStep,
 } from "../types.js";
 
 // --- Response helpers ---
@@ -348,6 +355,104 @@ export const TOOLS = [
       openWorldHint: false,
     },
   },
+  {
+    name: "walkthrough",
+    description:
+      "Record an interactive walkthrough — scripted clicks, typing, navigation with continuous video capture. Each step produces a screenshot and the full sequence becomes an MP4.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        target: {
+          type: "string",
+          description: "URL to start the walkthrough on",
+        },
+        steps: {
+          type: "array",
+          description: "Sequence of interaction steps",
+          items: {
+            type: "object",
+            properties: {
+              action: {
+                type: "string",
+                enum: [
+                  "click",
+                  "type",
+                  "fill",
+                  "hover",
+                  "select",
+                  "navigate",
+                  "screenshot",
+                  "wait",
+                  "scroll",
+                ],
+                description: "Action to perform",
+              },
+              selector: {
+                type: "string",
+                description: "CSS selector for the target element (click, type, fill, hover, select, scroll)",
+              },
+              text: {
+                type: "string",
+                description: "Text to type or fill",
+              },
+              value: {
+                type: "string",
+                description: "Value to select (select action)",
+              },
+              url: {
+                type: "string",
+                description: "URL to navigate to (navigate action)",
+              },
+              duration: {
+                type: "number",
+                description: "Milliseconds to wait (wait action)",
+              },
+              y: {
+                type: "number",
+                description: "Pixel Y position to scroll to (scroll action)",
+              },
+              title: {
+                type: "string",
+                description: "Human-readable title for this step",
+              },
+            },
+            required: ["action"],
+          },
+        },
+        viewport: {
+          type: "string",
+          enum: ["desktop", "mobile", "tablet"],
+          description: "Viewport preset (default: desktop)",
+        },
+        step_delay: {
+          type: "number",
+          description: "Milliseconds between steps (default: 500)",
+        },
+        title: { type: "string", description: "Title for this walkthrough" },
+        feature: {
+          type: "string",
+          description: "Feature this walkthrough belongs to",
+        },
+        component: {
+          type: "string",
+          description: "Component this walkthrough demonstrates",
+        },
+        tags: {
+          type: "array",
+          items: { type: "string" },
+          description: "Tags for this walkthrough",
+        },
+      },
+      required: ["target", "steps"],
+    },
+    annotations: {
+      title: "Interactive Walkthrough",
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
 ];
 
 // --- Tool handler dispatch ---
@@ -374,6 +479,8 @@ export async function handleToolCall(
         return handleStatus();
       case "delete":
         return handleDelete(args);
+      case "walkthrough":
+        return await handleWalkthrough(args);
       default:
         return errorResponse(`Unknown tool: ${name}`);
     }
@@ -559,6 +666,9 @@ function handleFind(
         `  ${[cap.feature, cap.component].filter(Boolean).join(" / ")}`
       );
     }
+    if (cap.walkthrough) {
+      lines.push(`  Walkthrough: ${cap.walkthrough.step_count} steps`);
+    }
   }
 
   return textResponse(lines.join("\n"));
@@ -692,6 +802,26 @@ async function handleExport(
     copyFileSync(srcFile, destPath);
     exported++;
 
+    // Export walkthrough assets (step screenshots + manifest)
+    if (cap.walkthrough) {
+      const walkthroughManifest = getFilePath(cap.id, "walkthrough.json");
+      if (existsSync(walkthroughManifest)) {
+        copyFileSync(walkthroughManifest, join(destDir, `${cap.id}_walkthrough.json`));
+      }
+      // Copy step screenshots
+      const { readdirSync } = await import("fs");
+      const capDir = getFilePath(cap.id, "").replace(/\/$/, "");
+      try {
+        for (const file of readdirSync(capDir)) {
+          if (file.startsWith("step_") && file.endsWith(".png")) {
+            copyFileSync(join(capDir, file), join(destDir, `${cap.id}_${file}`));
+          }
+        }
+      } catch {
+        // Step screenshots are optional
+      }
+    }
+
     if (manifest) {
       const date = new Date(cap.created_at).toISOString().slice(0, 16);
       manifestLines.push(`## ${cap.title || cap.id}`);
@@ -703,6 +833,8 @@ async function handleExport(
         manifestLines.push(`- **Component:** ${cap.component}`);
       if (cap.tags.length)
         manifestLines.push(`- **Tags:** ${cap.tags.join(", ")}`);
+      if (cap.walkthrough)
+        manifestLines.push(`- **Steps:** ${cap.walkthrough.step_count} (${cap.walkthrough.steps.join(", ")})`);
       manifestLines.push(`- **File:** ${destName}`);
       manifestLines.push(`\n![${cap.title || cap.id}](./${destName})\n`);
     }
@@ -760,6 +892,110 @@ function handleStatus(): { content: ContentBlock[]; isError?: boolean } {
   }
 
   return textResponse(lines.join("\n"));
+}
+
+async function handleWalkthrough(
+  args: Record<string, unknown>
+): Promise<{ content: ContentBlock[]; isError?: boolean }> {
+  const target = args.target as string;
+  if (!target) return errorResponse("target is required");
+
+  const steps = args.steps as WalkthroughStep[] | undefined;
+  if (!steps?.length) return errorResponse("steps array is required and must not be empty");
+
+  const id = generateId();
+  const dir = ensureCaptureDir(id);
+  const finalPath = getFilePath(id, "original.mp4");
+  const thumbPath = getFilePath(id, "thumb.png");
+  const git = getGitContext();
+
+  const result = await webWalkthrough({
+    url: target,
+    captureDir: dir,
+    steps,
+    viewport: (args.viewport as ViewportPreset) || "desktop",
+    stepDelay: (args.step_delay as number) || 500,
+  });
+
+  // Transcode WebM → MP4
+  if (result.videoPath && isTranscodeNeeded(result.videoPath)) {
+    await transcodeToMp4(result.videoPath, finalPath);
+  } else if (result.videoPath && result.videoPath !== finalPath) {
+    const { renameSync } = await import("fs");
+    renameSync(result.videoPath, finalPath);
+  }
+
+  // Generate thumbnail
+  let thumbnailPath: string | undefined;
+  const { existsSync } = await import("fs");
+  if (existsSync(finalPath)) {
+    try {
+      await extractThumbnail(finalPath, thumbPath);
+      thumbnailPath = thumbPath;
+    } catch {
+      // Thumbnail is optional
+    }
+  }
+
+  const durationMs = existsSync(finalPath)
+    ? await getVideoDuration(finalPath)
+    : result.stepResults[result.stepResults.length - 1]?.timestamp_ms || 0;
+
+  const stepTitles = result.stepResults
+    .map((s) => s.title)
+    .filter(Boolean);
+
+  const entry: CaptureEntry = {
+    id,
+    created_at: Date.now(),
+    type: "video",
+    format: "mp4",
+    size_bytes: getFileSize(finalPath),
+    duration_ms: durationMs,
+    source: "web",
+    platform: "web",
+    url: target,
+    viewport: result.viewport,
+    title: args.title as string | undefined,
+    feature: args.feature as string | undefined,
+    component: args.component as string | undefined,
+    tags: (args.tags as string[]) || [],
+    starred: false,
+    walkthrough: {
+      step_count: result.stepResults.length,
+      steps: stepTitles,
+    },
+    git_branch: git.branch,
+    git_commit: git.commit,
+  };
+
+  addCapture(entry);
+
+  // Build response
+  const errors = result.stepResults.filter((s) => s.error);
+  const lines = [
+    `Walkthrough recorded: ${id}`,
+    entry.title ? `Title: ${entry.title}` : null,
+    `Steps: ${result.stepResults.length} (${errors.length} errors)`,
+    `Duration: ${(durationMs / 1000).toFixed(1)}s`,
+    `Size: ${formatBytes(entry.size_bytes)}`,
+    `Video: ${finalPath}`,
+    thumbnailPath ? `Thumbnail: ${thumbnailPath}` : null,
+    `Manifest: ${result.manifestPath}`,
+    entry.tags.length ? `Tags: ${entry.tags.join(", ")}` : null,
+    ``,
+    `Step results:`,
+  ];
+
+  for (const step of result.stepResults) {
+    const status = step.error ? `ERROR: ${step.error}` : "OK";
+    const screenshot = step.screenshotFile ? ` [${step.screenshotFile}]` : "";
+    lines.push(
+      `  ${step.index}. ${step.action}: ${step.title} — ${status}${screenshot} (${step.duration_ms}ms)`
+    );
+  }
+
+  return textResponse(lines.filter((l) => l !== null).join("\n"));
 }
 
 function handleDelete(

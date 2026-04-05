@@ -58,6 +58,7 @@ export function filterCaptures(
         c.feature,
         c.component,
         ...c.tags,
+        ...(c.walkthrough?.steps || []),
       ]
         .filter(Boolean)
         .join(" ")
