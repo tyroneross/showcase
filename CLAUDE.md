@@ -1,3 +1,6 @@
+<!-- Plugin: showcase · Version: 0.1.0 · Source of truth: local (~/Desktop/git-folder/showcase) -->
+<!-- Before any commit, version bump, or major change, read ./VERSIONING.md. Update it on version bumps. -->
+
 # Showcase — Dev Asset Capture
 
 Capture screenshots and video clips during development for blog/website content.
