@@ -15,6 +15,5 @@
     "dev-assets",
     "blog"
   ],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }

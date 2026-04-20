@@ -1,16 +1,5 @@
 {
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "If the command output indicates a successful build, deploy, or server start, and the user is doing UI work, briefly mention that /showcase:capture is available. One sentence max. Do NOT auto-capture."
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "hooks": [
