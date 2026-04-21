@@ -1,3 +1,5 @@
+> **⚠️ DEPRECATED — use the spectra plugin instead.** The `spectra_library` tool covers all showcase functionality and includes a non-destructive migration: `spectra_library action="migrate-from-showcase"`. See the showcase README for full migration steps.
+
 <!-- Plugin: showcase · Version: 0.1.0 · Source of truth: local (~/Desktop/git-folder/showcase) -->
 <!-- Before any commit, version bump, or major change, read ./VERSIONING.md. Update it on version bumps. -->
 

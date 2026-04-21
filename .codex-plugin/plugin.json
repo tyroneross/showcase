@@ -1,0 +1,31 @@
+{
+  "name": "showcase",
+  "version": "0.1.0",
+  "description": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+  "author": {
+    "name": "Tyrone Ross"
+  },
+  "homepage": "https://github.com/tyroneross/showcase",
+  "repository": "https://github.com/tyroneross/showcase",
+  "license": "MIT",
+  "keywords": [
+    "screenshots",
+    "video",
+    "capture",
+    "dev-assets",
+    "blog"
+  ],
+  "skills": "./skills",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Showcase",
+    "shortDescription": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+    "longDescription": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+    "developerName": "Ross Labs",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ]
+  }
+}

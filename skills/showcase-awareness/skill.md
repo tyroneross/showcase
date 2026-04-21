@@ -1,13 +1,7 @@
 ---
-name: showcase-awareness
-description: Suggest capturing screenshots or video at opportune moments during development
-triggers:
-  - "build succeeded"
-  - "deploy complete"
-  - "server started"
-  - "UI looks good"
-  - "that's working"
----
+
+> **⚠️ DEPRECATED — use the spectra plugin instead.** The `spectra_library` tool covers all showcase functionality and includes a non-destructive migration: `spectra_library action="migrate-from-showcase"`. See the showcase README for full migration steps.
+
 
 # Showcase Awareness
 
