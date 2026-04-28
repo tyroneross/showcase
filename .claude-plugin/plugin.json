@@ -1,7 +1,7 @@
 {
   "name": "showcase",
   "version": "0.1.2",
-  "description": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+  "description": "[Deprecated \u2014 use spectra] Dev asset capture for blog and website content",
   "author": {
     "name": "Tyrone Ross"
   },
