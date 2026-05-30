@@ -1,6 +1,6 @@
 {
   "name": "@tyroneross/showcase",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Dev asset capture plugin for Claude Code — screenshots and video clips during development",
   "type": "module",
   "main": "dist/index.js",
