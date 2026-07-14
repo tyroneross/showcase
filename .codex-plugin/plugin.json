@@ -1,7 +1,6 @@
 {
   "name": "showcase",
-  "version": "0.1.0",
-  "description": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+  "description": "Dev asset capture — screenshots and video clips during development for blog/website content",
   "author": {
     "name": "Tyrone Ross"
   },
@@ -19,8 +18,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Showcase",
-    "shortDescription": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
-    "longDescription": "Dev asset capture \u2014 screenshots and video clips during development for blog/website content",
+    "shortDescription": "Dev asset capture — screenshots and video clips during development for blog/website content",
+    "longDescription": "Dev asset capture — screenshots and video clips during development for blog/website content",
     "developerName": "Ross Labs",
     "category": "Productivity",
     "capabilities": [
