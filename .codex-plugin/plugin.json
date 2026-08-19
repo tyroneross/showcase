@@ -2,7 +2,8 @@
   "name": "showcase",
   "description": "Dev asset capture — screenshots and video clips during development for blog/website content",
   "author": {
-    "name": "Tyrone Ross"
+    "name": "Tyrone Ross",
+    "url": "https://github.com/tyroneross"
   },
   "homepage": "https://github.com/tyroneross/showcase",
   "repository": "https://github.com/tyroneross/showcase",

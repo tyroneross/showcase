@@ -2,7 +2,8 @@
   "name": "showcase",
   "description": "[Deprecated — use spectra] Dev asset capture for blog and website content",
   "author": {
-    "name": "Tyrone Ross"
+    "name": "Tyrone Ross",
+    "url": "https://github.com/tyroneross"
   },
   "homepage": "https://github.com/tyroneross/showcase",
   "repository": "https://github.com/tyroneross/showcase",
