@@ -88,20 +88,14 @@ Defined and dispatched in `src/mcp/tools.ts`. All 9 tools are registered in the 
 
 ## Commands
 
-8 slash commands in `commands/`. Each file is a Markdown definition consumed by the Claude Code plugin system.
+2 slash commands in `commands/` — the plugin exposes one router as its user-invocable surface, per the "most plugins should not expose individual actions" policy. Each file is a Markdown definition consumed by the Claude Code plugin system.
 
 | Command | File |
 |---|---|
-| `/showcase:capture` | `commands/capture.md` |
-| `/showcase:export` | `commands/export.md` |
-| `/showcase:find` | `commands/find.md` |
-| `/showcase:gallery` | `commands/gallery.md` |
-| `/showcase:record` | `commands/record.md` |
-| `/showcase:status` | `commands/status.md` |
-| `/showcase:tag` | `commands/tag.md` |
-| `/showcase:walkthrough` | `commands/walkthrough.md` |
+| `/showcase` | `commands/showcase.md` — router; dispatches to the matching MCP tool (capture/record/find/gallery/export/status/tag/walkthrough) based on intent |
+| `/showcase:feedback` | `commands/feedback.md` |
 
-To change a command's behavior or description, edit the corresponding `.md` file. Do not rename files without updating `plugin.json`.
+To change routing behavior or descriptions, edit `commands/showcase.md`. Do not rename files without updating `plugin.json`.
 
 ## Hooks
 
@@ -109,14 +103,14 @@ Defined in `hooks/hooks.json`. Two active hooks:
 
 | Event | Matcher | Behavior |
 |---|---|---|
-| `PostToolUse` | `Bash` | If the command output indicates a successful build/deploy/server start and the user is doing UI work, suggest `/showcase:capture` in one sentence. Does NOT auto-capture. |
+| `PostToolUse` | `Bash` | If the command output indicates a successful build/deploy/server start and the user is doing UI work, suggest `/showcase` in one sentence. Does NOT auto-capture. |
 | `SessionStart` | (all sessions) | Reminds the user that Showcase commands are available. |
 
 Hooks use `type: "prompt"` — they inject text into Claude's context, not executable code. Keep them lightweight.
 
 ## Skills
 
-One skill: `skills/showcase-awareness/skill.md`
+One skill: `skills/showcase-awareness/SKILL.md` — `user-invocable: false` (advisory only, loaded by Claude automatically; not directly callable by the user).
 
 This is a passive awareness skill. It watches for natural capture moments (e.g. "I just built the new dashboard") and suggests capture without being intrusive. Keep suggestions short and non-blocking. Do not convert this into an auto-capture behavior.
 

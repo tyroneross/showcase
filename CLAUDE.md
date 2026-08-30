@@ -1,6 +1,6 @@
 > **⚠️ DEPRECATED — use the spectra plugin instead.** The `spectra_library` tool covers all showcase functionality and includes a non-destructive migration: `spectra_library action="migrate-from-showcase"`. See the showcase README for full migration steps.
 
-<!-- Plugin: showcase · Version: 0.1.0 · Source of truth: local (~/Desktop/git-folder/showcase) -->
+<!-- Plugin: showcase · Version: 0.1.3 · Source of truth: local (~/dev/git-folder/showcase) -->
 <!-- Before any commit, version bump, or major change, read ./VERSIONING.md. Update it on version bumps. -->
 
 # Showcase — Dev Asset Capture
@@ -25,14 +25,8 @@ Capture screenshots and video clips during development for blog/website content.
 
 | Command | Purpose |
 |---------|---------|
-| `/showcase:capture` | Take a screenshot |
-| `/showcase:record` | Record a video clip |
-| `/showcase:find` | Search captures |
-| `/showcase:tag` | Tag a capture |
-| `/showcase:gallery` | Overview of all captures |
-| `/showcase:export` | Export for blog/website |
-| `/showcase:walkthrough` | Record interactive walkthrough |
-| `/showcase:status` | Library stats |
+| `/showcase` | Router — dispatches to the matching MCP tool (capture/record/find/tag/gallery/export/walkthrough/status) based on intent |
+| `/showcase:feedback` | Report a bug or send feedback |
 
 ## Capture Targets
 

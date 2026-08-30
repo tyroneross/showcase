@@ -2,7 +2,7 @@
 
 ## Current
 
-- **Version:** 0.1.0
+- **Version:** 0.1.3
 - **Source of truth:** Local dev (`~/Desktop/git-folder/showcase`)
 - **Also available at:**
   - GitHub: https://github.com/tyroneross/showcase
@@ -42,4 +42,6 @@ Showcase is `@local` scope — loaded directly from the source dir, no cache dir
 
 ## Version history
 
-- **0.1.0** (current): Initial release with macOS capture, walkthrough support, MCP + slash commands
+- **0.1.3** (current): Surface reduction — commands collapsed to `/showcase` (router) + `/showcase:feedback`; the 8 individual action commands (capture/record/find/tag/gallery/export/status/walkthrough) were deleted since the router now calls the MCP tools directly and no session in transcript mining ever invoked them as slash commands. `skills/showcase-awareness` marked `user-invocable: false` and renamed `skill.md` → `SKILL.md`.
+- **0.1.2**: (undocumented in this file — pre-existing gap)
+- **0.1.0**: Initial release with macOS capture, walkthrough support, MCP + slash commands
