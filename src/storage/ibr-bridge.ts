@@ -66,7 +66,7 @@ function scanDirectory(dir: string, candidates: IbrCandidate[]): void {
 
 /**
  * Import an IBR screenshot into Showcase by copying the file and creating an index entry.
- * Used by the tag tool when user does: /showcase:tag <ibr-id> +blog
+ * Used by the tag tool when user does: /showcase tag <ibr-id> +blog
  */
 export function ibrCandidateToEntry(
   candidate: IbrCandidate,

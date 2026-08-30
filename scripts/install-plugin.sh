@@ -70,11 +70,8 @@ else
   echo "Showcase plugin installed for project: $CWD"
   echo ""
   echo "Commands available:"
-  echo "  /showcase:capture  — Take a screenshot"
-  echo "  /showcase:record   — Record a video clip"
-  echo "  /showcase:find     — Search captures"
-  echo "  /showcase:gallery  — View all captures"
-  echo "  /showcase:export   — Export for blog/website"
+  echo "  /showcase          — Router: capture, record, find, gallery, export, status, tag"
+  echo "  /showcase:feedback — Report a bug or send feedback"
 fi
 
 echo ""

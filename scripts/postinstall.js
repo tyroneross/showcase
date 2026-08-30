@@ -76,10 +76,10 @@ try {
 console.log('');
 console.log(`${BOLD}Quick Start${RESET}`);
 console.log(`${DIM}─────────────────────────────────────────────${RESET}`);
-console.log(`  ${GREEN}1.${RESET} Screenshot:  ${CYAN}/showcase:capture${RESET}  ${DIM}(URL, app, or simulator)${RESET}`);
-console.log(`  ${GREEN}2.${RESET} Video clip:  ${CYAN}/showcase:record${RESET}   ${DIM}(5-30s MP4)${RESET}`);
-console.log(`  ${GREEN}3.${RESET} Find:        ${CYAN}/showcase:find${RESET}     ${DIM}(search by tags/feature)${RESET}`);
-console.log(`  ${GREEN}4.${RESET} Export:      ${CYAN}/showcase:export${RESET}   ${DIM}(for blog/website)${RESET}`);
+console.log(`  ${GREEN}1.${RESET} Screenshot:  ${CYAN}/showcase capture${RESET}  ${DIM}(URL, app, or simulator)${RESET}`);
+console.log(`  ${GREEN}2.${RESET} Video clip:  ${CYAN}/showcase record${RESET}   ${DIM}(5-30s MP4)${RESET}`);
+console.log(`  ${GREEN}3.${RESET} Find:        ${CYAN}/showcase find${RESET}     ${DIM}(search by tags/feature)${RESET}`);
+console.log(`  ${GREEN}4.${RESET} Export:      ${CYAN}/showcase export${RESET}   ${DIM}(for blog/website)${RESET}`);
 console.log('');
 console.log(`${DIM}Docs: https://github.com/tyroneross/showcase${RESET}`);
 console.log('');
