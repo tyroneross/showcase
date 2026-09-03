@@ -16,8 +16,10 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+      # 11.5.1 is the documented floor for trusted publishing, and Node 22
+      # ships npm 10.x — below it. https://docs.npmjs.com/trusted-publishers/
+      - name: Use npm >= 11.5.1 (trusted-publishing floor)
+        run: npm install -g npm@^11.5.1
       - run: npm ci
       - run: npm run build
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
