@@ -71,7 +71,7 @@ else
   echo ""
   echo "Commands available:"
   echo "  /showcase          — Router: capture, record, find, gallery, export, status, tag"
-  echo "  /showcase:feedback — Report a bug or send feedback"
+  echo "  /showcase:submit-feedback — Report a bug or request a feature"
 fi
 
 echo ""
