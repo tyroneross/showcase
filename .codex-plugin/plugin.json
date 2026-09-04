@@ -1,6 +1,6 @@
 {
   "name": "showcase",
-  "description": "Dev asset capture — screenshots and video clips during development for blog/website content",
+  "description": "[Deprecated: use spectra] Screenshots and clips of work in progress get lost in a Downloads folder, so writing about what you built means rebuilding it to capture it. Showcase captured screenshots and video clips during development into a searchable, taggable library. Spectra now covers all of it; migrate with the spectra_library migrate-from-showcase action. Start with /showcase.",
   "author": {
     "name": "Tyrone Ross",
     "url": "https://github.com/tyroneross"
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "Showcase",
     "shortDescription": "Dev asset capture — screenshots and video clips during development for blog/website content",
-    "longDescription": "Dev asset capture — screenshots and video clips during development for blog/website content",
+    "longDescription": "[Deprecated: use spectra] Screenshots and clips of work in progress get lost in a Downloads folder, so writing about what you built means rebuilding it to capture it. Showcase captured screenshots and video clips during development into a searchable, taggable library. Spectra now covers all of it; migrate with the spectra_library migrate-from-showcase action. Start with /showcase.",
     "developerName": "Ross Labs",
     "category": "Productivity",
     "capabilities": [

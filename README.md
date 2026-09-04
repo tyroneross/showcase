@@ -20,7 +20,14 @@
 
 ---
 
-Dev asset capture for AI coding agents — screenshots, video clips, and walkthrough assets for blog, website, and product content.
+Dev asset capture for AI coding agents: screenshots, video clips, and walkthrough assets for blog, website, and product content.
+
+## Start here
+
+Type `/showcase`. It is the plugin's only command, a router that dispatches to capture, record,
+find, gallery, export, status, tag, and walkthrough. To report a plugin bug or request a feature,
+use `/showcase:submit-feedback`. New work should go to spectra instead; see the deprecation notice
+above.
 
 ## Claude Code
 

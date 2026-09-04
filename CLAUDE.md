@@ -26,7 +26,7 @@ Capture screenshots and video clips during development for blog/website content.
 | Command | Purpose |
 |---------|---------|
 | `/showcase` | Router — dispatches to the matching MCP tool (capture/record/find/tag/gallery/export/walkthrough/status) based on intent |
-| `/showcase:feedback` | Report a bug or send feedback |
+| `/showcase:submit-feedback` | Report a bug or request a feature |
 
 ## Capture Targets
 

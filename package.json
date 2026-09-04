@@ -1,7 +1,7 @@
 {
   "name": "@tyroneross/showcase",
   "version": "0.1.2",
-  "description": "Dev asset capture plugin for Claude Code — screenshots and video clips during development",
+  "description": "[Deprecated: use spectra] Screenshots and clips of work in progress get lost in a Downloads folder, so writing about what you built means rebuilding it to capture it. Showcase captured screenshots and video clips during development into a searchable, taggable library. Spectra now covers all of it; migrate with the spectra_library migrate-from-showcase action. Start with /showcase.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

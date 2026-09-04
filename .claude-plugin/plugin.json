@@ -1,6 +1,6 @@
 {
   "name": "showcase",
-  "description": "[Deprecated — use spectra] Dev asset capture for blog and website content",
+  "description": "[Deprecated: use spectra] Screenshots and clips of work in progress get lost in a Downloads folder, so writing about what you built means rebuilding it to capture it. Showcase captured screenshots and video clips during development into a searchable, taggable library. Spectra now covers all of it; migrate with the spectra_library migrate-from-showcase action. Start with /showcase.",
   "author": {
     "name": "Tyrone Ross",
     "url": "https://github.com/tyroneross"

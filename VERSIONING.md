@@ -1,4 +1,9 @@
-# Showcase — Versioning & Source of Truth
+# Showcase - Versioning & Source of Truth
+
+> **Status (2026-09-03):** this plugin is deprecated in favour of `spectra`, and the release
+> ritual below is no longer run. `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`
+> deliberately omit `version`, so the plugin version resolves to the git commit SHA and cannot
+> go stale against `package.json`. The `Current` section records the last hand-cut release.
 
 ## Current
 

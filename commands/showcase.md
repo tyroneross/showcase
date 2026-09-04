@@ -30,7 +30,7 @@ Route this request to the appropriate Showcase MCP tool based on the user's inte
 - **tag** — Add/remove tags, update title, feature, component, or star a capture. Requires a capture ID; if the user references a capture by description rather than ID, run `find` first to locate it.
 - **walkthrough** — Record an interactive walkthrough with scripted steps. Use the provided target, or check `.showcaserc.json`, or ask. Build a `steps` array from the user's description — each step needs an `action` (click, type, fill, hover, select, navigate, screenshot, wait, scroll) and relevant parameters. Give each step a descriptive `title` (searchable via `find`). After recording, report: capture ID, step count, any step errors, video path, and manifest path.
 
-For bugs or feedback about the plugin itself, use `/showcase:feedback`.
+For bugs or feedback about the plugin itself, use `/showcase:submit-feedback`.
 
 ## Examples
 

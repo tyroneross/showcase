@@ -93,7 +93,7 @@ Defined and dispatched in `src/mcp/tools.ts`. All 9 tools are registered in the 
 | Command | File |
 |---|---|
 | `/showcase` | `commands/showcase.md` — router; dispatches to the matching MCP tool (capture/record/find/gallery/export/status/tag/walkthrough) based on intent |
-| `/showcase:feedback` | `commands/feedback.md` |
+| `/showcase:submit-feedback` | `commands/submit-feedback.md` |
 
 To change routing behavior or descriptions, edit `commands/showcase.md`. Do not rename files without updating `plugin.json`.
 
